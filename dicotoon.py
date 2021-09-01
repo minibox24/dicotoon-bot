@@ -197,6 +197,35 @@ class DicoToonCog(commands.Cog):
             created_at=message.created_at,
         )
 
+    @commands.Cog.listener()
+    async def on_raw_reaction_remove(self, payload):
+        if payload.emoji != "\N{GLOWING STAR}":
+            return
+
+        toon_channel = await ToonChannel.filter(id=payload.channel_id).first()
+
+        if not toon_channel:
+            return
+
+        message = await (self.bot.get_channel(payload.channel_id)).fetch_message(
+            payload.message_id
+        )
+
+        if list(filter(lambda r: r.emoji == "\N{GLOWING STAR}", message.reactions)):
+            return
+
+        if not message.attachments or not message.attachments[
+            0
+        ].content_type.startswith("image/"):
+            return
+
+        toon_data = await ToonData.filter(
+            url=message.attachments[0].url.split("/attachments/")[-1]
+        ).first()
+
+        if toon_data:
+            await toon_data.delete()
+
 
 def setup(bot):
     bot.add_cog(DicoToonCog(bot))
