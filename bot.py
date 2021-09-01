@@ -5,7 +5,7 @@ from tortoise import Tortoise
 class DicoToon(Bot):
     def __init__(self, db_url, *args, **kwargs):
         if not kwargs.get("command_prefix"):
-            kwargs["command_prefix"] = "!"
+            kwargs["command_prefix"] = "dt!"
 
         super().__init__(*args, **kwargs)
 
