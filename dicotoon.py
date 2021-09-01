@@ -239,6 +239,14 @@ class DicoToonCog(commands.Cog):
         if toon_data:
             await toon_data.delete()
 
+    @commands.Cog.listener()
+    async def on_raw_bulk_message_delete(self, payload):
+        for i in payload.message_ids:
+            toon_data = await ToonData.filter(message_id=i).first()
+
+            if toon_data:
+                await toon_data.delete()
+
 
 def setup(bot):
     bot.add_cog(DicoToonCog(bot))
