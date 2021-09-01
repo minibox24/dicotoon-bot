@@ -123,6 +123,33 @@ class DicoToonCog(commands.Cog):
 
         await self.bot.loop.create_task(self.fetch_all(channel))
 
+    @commands.command("탈퇴")
+    async def unregister(self, ctx, channel: discord.TextChannel = None):
+        if not channel:
+            channel = ctx.channel
+
+        toon_channel = await ToonChannel.filter(id=channel.id).first()
+
+        if not toon_channel:
+            return await ctx.send("등록되지 않은 채널이에요.")
+
+        if not channel.permissions_for(ctx.author).manage_channels:
+            return await ctx.send(
+                f"{ctx.author.name}님은 {channel.mention}에 채널 관리 권한이 없어요."
+            )
+
+        view = ConfirmView(ctx.author.id)
+        msg = await ctx.reply(f"정말로 {channel.mention}을(를) 디코툰 서비스에서 탈퇴할까요?", view=view)
+
+        await view.wait()
+
+        if not view.confirm:
+            return await msg.edit("취소했어요.", embed=None, view=None)
+
+        await toon_channel.delete()
+
+        await msg.edit(f"{channel.mention}을(를) 디코툰 서비스에서 탈퇴했어요.", embed=None, view=None)
+
 
 def setup(bot):
     bot.add_cog(DicoToonCog(bot))
