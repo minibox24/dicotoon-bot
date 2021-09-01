@@ -15,4 +15,7 @@ class DicoToon(Bot):
         await Tortoise.init(db_url=self.db_url, modules={"models": ["models"]})
         await Tortoise.generate_schemas()
 
+        self.load_extension("jishaku")
+        self.load_extension("dicotoon")
+
         print("ready")
