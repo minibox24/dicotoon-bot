@@ -34,6 +34,18 @@ class DicoToonCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    async def get_user(user):
+        user = await ToonUser.filter(id=user.id).first()
+
+        if not user:
+            user = await ToonUser.create(
+                id=user.id,
+                name=user.name,
+                avatar=user.display_avatar.url,
+            )
+
+        return user
+
     async def fetch_all(self, channel: discord.TextChannel):
         stop_count = 0
         toon_channel = await ToonChannel.get(id=channel.id)
@@ -53,14 +65,8 @@ class DicoToonCog(commands.Cog):
                 user = users.get(message.author.id)
 
                 if not user:
-                    user = await ToonUser.filter(id=message.author.id).first()
-
-                    if not user:
-                        user = await ToonUser.create(
-                            id=message.author.id,
-                            name=message.author.name,
-                            avatar=message.author.display_avatar.url,
-                        )
+                    user = await self.get_user(message.author)
+                    users[message.author.id] = user
 
                 await ToonData.create(
                     url=attachment.url,
