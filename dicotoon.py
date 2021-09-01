@@ -203,49 +203,21 @@ class DicoToonCog(commands.Cog):
         if payload.emoji != "\N{GLOWING STAR}":
             return
 
-        toon_channel = await ToonChannel.filter(id=payload.channel_id).first()
-
-        if not toon_channel:
-            return
-
-        message = await (self.bot.get_channel(payload.channel_id)).fetch_message(
-            payload.message_id
-        )
-
-        if list(filter(lambda r: r.emoji == "\N{GLOWING STAR}", message.reactions)):
-            return
-
-        if not message.attachments or not message.attachments[
-            0
-        ].content_type.startswith("image/"):
-            return
-
-        toon_data = await ToonData.filter(
-            url=message.attachments[0].url.split("/attachments/")[-1]
-        ).first()
+        toon_data = await ToonData.filter(message_id=payload.message_id).first()
 
         if toon_data:
-            await toon_data.delete()
+            message = await (self.bot.get_channel(payload.channel_id)).fetch_message(
+                payload.message_id
+            )
+
+            if not list(
+                filter(lambda r: r.emoji == "\N{GLOWING STAR}", message.reactions)
+            ):
+                await toon_data.delete()
 
     @commands.Cog.listener()
     async def on_raw_reaction_clear(self, payload):
-        toon_channel = await ToonChannel.filter(id=payload.channel_id).first()
-
-        if not toon_channel:
-            return
-
-        message = await (self.bot.get_channel(payload.channel_id)).fetch_message(
-            payload.message_id
-        )
-
-        if not message.attachments or not message.attachments[
-            0
-        ].content_type.startswith("image/"):
-            return
-
-        toon_data = await ToonData.filter(
-            url=message.attachments[0].url.split("/attachments/")[-1]
-        ).first()
+        toon_data = await ToonData.filter(message_id=payload.message_id).first()
 
         if toon_data:
             await toon_data.delete()
@@ -255,23 +227,7 @@ class DicoToonCog(commands.Cog):
         if payload.emoji != "\N{GLOWING STAR}":
             return
 
-        toon_channel = await ToonChannel.filter(id=payload.channel_id).first()
-
-        if not toon_channel:
-            return
-
-        message = await (self.bot.get_channel(payload.channel_id)).fetch_message(
-            payload.message_id
-        )
-
-        if not message.attachments or not message.attachments[
-            0
-        ].content_type.startswith("image/"):
-            return
-
-        toon_data = await ToonData.filter(
-            url=message.attachments[0].url.split("/attachments/")[-1]
-        ).first()
+        toon_data = await ToonData.filter(message_id=payload.message_id).first()
 
         if toon_data:
             await toon_data.delete()
