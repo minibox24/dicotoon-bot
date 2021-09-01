@@ -35,11 +35,13 @@ class DicoToonCog(commands.Cog):
         self.bot = bot
 
     async def fetch_all(self, channel: discord.TextChannel):
+        stop_count = 0
         toon_channel = await ToonChannel.get(id=channel.id)
         users = {}
 
         async for message in channel.history(limit=None):
             if not message.attachments:
+                stop_count += 1
                 continue
 
             if list(filter(lambda r: r.emoji == "\N{GLOWING STAR}", message.reactions)):
@@ -66,6 +68,13 @@ class DicoToonCog(commands.Cog):
                     channel=toon_channel,
                     created_at=message.created_at,
                 )
+
+                stop_count = 0
+            else:
+                stop_count += 1
+
+            if stop_count >= 200:
+                break
 
     @commands.command("종료")
     @commands.is_owner()
