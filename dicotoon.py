@@ -3,6 +3,7 @@ from discord.ext import commands
 from discord.ui.view import View
 from discord.ui.button import button
 
+from tortoise import Tortoise
 from models import *
 
 
@@ -32,6 +33,13 @@ class ConfirmView(View):
 class DicoToonCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+
+    @commands.command("종료")
+    @commands.is_owner()
+    async def exit_bot(self, ctx):
+        await ctx.send("봇을 종료할게요.")
+        await Tortoise.close_connections()
+        await self.bot.close()
 
     @commands.command("등록")
     async def register(self, ctx, name, channel: discord.TextChannel = None):
