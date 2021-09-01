@@ -34,6 +34,39 @@ class DicoToonCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    async def fetch_all(self, channel: discord.TextChannel):
+        toon_channel = await ToonChannel.get(id=channel.id)
+        users = {}
+
+        async for message in channel.history(limit=None):
+            if not message.attachments:
+                continue
+
+            if list(filter(lambda r: r.emoji == "\N{GLOWING STAR}", message.reactions)):
+                attachment = message.attachments[0]
+
+                if not attachment.content_type.startswith("image/"):
+                    continue
+
+                user = users.get(message.author.id)
+
+                if not user:
+                    user = await ToonUser.filter(id=message.author.id).first()
+
+                    if not user:
+                        user = await ToonUser.create(
+                            id=message.author.id,
+                            name=message.author.name,
+                            avatar=message.author.display_avatar.url,
+                        )
+
+                await ToonData.create(
+                    url=attachment.url,
+                    user=user,
+                    channel=toon_channel,
+                    created_at=message.created_at,
+                )
+
     @commands.command("종료")
     @commands.is_owner()
     async def exit_bot(self, ctx):
@@ -46,15 +79,18 @@ class DicoToonCog(commands.Cog):
         if not channel:
             channel = ctx.channel
 
-        if ToonChannel.exists(id=channel.id):
+        if await ToonChannel.exists(id=channel.id):
             return await ctx.send("이미 등록된 채널이에요.")
 
         name = discord.utils.escape_markdown(name)
 
-        if not ctx.channel.permissions_for(ctx.author).manage_channels:
+        if not channel.permissions_for(ctx.author).manage_channels:
             return await ctx.send(
                 f"{ctx.author.name}님은 {channel.mention}에 채널 관리 권한이 없어요."
             )
+
+        if not channel.permissions_for(ctx.guild.me).read_message_history:
+            return await ctx.send(f"{channel.mention}에서 저에게 메시지 기록 보기 권한이 필요해요.")
 
         embed = discord.Embed(
             title="확인",
@@ -84,6 +120,8 @@ class DicoToonCog(commands.Cog):
         await ToonChannel.create(id=channel.id, name=name)
 
         await msg.edit("채널을 디코툰 서비스에 등록했어요.", embed=None, view=None)
+
+        await self.bot.loop.create_task(self.fetch_all(channel))
 
 
 def setup(bot):
