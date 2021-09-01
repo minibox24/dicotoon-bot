@@ -165,23 +165,29 @@ class DicoToonCog(commands.Cog):
 
         await msg.edit(f"{channel.mention}을(를) 디코툰 서비스에서 탈퇴했어요.", embed=None, view=None)
 
-
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
+        if payload.emoji != "\N{GLOWING STAR}":
+            return
+
         toon_channel = await ToonChannel.filter(id=payload.channel_id).first()
 
         if not toon_channel:
             return
-        
-        message = await (self.bot.get_channel(payload.channel_id)).fetch_message(payload.message_id)
 
-        if not message.attachments or not message.attachments[0].content_type.startswith("image/"):
+        message = await (self.bot.get_channel(payload.channel_id)).fetch_message(
+            payload.message_id
+        )
+
+        if not message.attachments or not message.attachments[
+            0
+        ].content_type.startswith("image/"):
             return
 
         url = message.attachments[0].url
-        if await ToonData.exists(url=url.split('/attachments/')[-1]):
+        if await ToonData.exists(url=url.split("/attachments/")[-1]):
             return
-        
+
         user = await self.get_user(message.author)
 
         await ToonData.create(
@@ -190,6 +196,7 @@ class DicoToonCog(commands.Cog):
             channel=toon_channel,
             created_at=message.created_at,
         )
+
 
 def setup(bot):
     bot.add_cog(DicoToonCog(bot))
