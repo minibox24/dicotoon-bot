@@ -22,7 +22,8 @@ class ToonChannel(Model):
 
 
 class ToonData(Model):
-    id = fields.IntField(pk=True)
+    id = fields.BigIntField(pk=True)
+    message_id = fields.BigIntField()
     url = ImageURLField()
     user = fields.ForeignKeyField("models.ToonUser")
     channel = fields.ForeignKeyField("models.ToonChannel")

@@ -69,6 +69,7 @@ class DicoToonCog(commands.Cog):
                     users[message.author.id] = user
 
                 await ToonData.create(
+                    message_id=message.id,
                     url=attachment.url,
                     user=user,
                     channel=toon_channel,
@@ -274,6 +275,7 @@ class DicoToonCog(commands.Cog):
 
         if toon_data:
             await toon_data.delete()
+
 
 def setup(bot):
     bot.add_cog(DicoToonCog(bot))
