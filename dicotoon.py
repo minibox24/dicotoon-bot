@@ -34,17 +34,17 @@ class DicoToonCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    async def get_user(user):
-        user = await ToonUser.filter(id=user.id).first()
+    async def get_user(self, user):
+        toon_user = await ToonUser.filter(id=user.id).first()
 
-        if not user:
-            user = await ToonUser.create(
+        if not toon_user:
+            toon_user = await ToonUser.create(
                 id=user.id,
                 name=user.name,
                 avatar=user.display_avatar.url,
             )
 
-        return user
+        return toon_user
 
     async def fetch_all(self, channel: discord.TextChannel):
         stop_count = 0
