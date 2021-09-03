@@ -21,7 +21,7 @@ class DicoToon(Bot):
         self.load_extension("jishaku")
         self.load_extension("dicotoon")
 
-        await self.bot.change_presence(
+        await self.change_presence(
             activity=Activity(
                 type=ActivityType.watching,
                 name=f"dt!도움",
