@@ -1,3 +1,4 @@
+from discord import Activity, ActivityType
 from discord.ext.commands import Bot
 from tortoise import Tortoise
 
@@ -9,6 +10,8 @@ class DicoToon(Bot):
 
         super().__init__(*args, **kwargs)
 
+        self.remove_command("help")
+
         self.db_url = db_url
 
     async def on_ready(self):
@@ -17,5 +20,12 @@ class DicoToon(Bot):
 
         self.load_extension("jishaku")
         self.load_extension("dicotoon")
+
+        await self.bot.change_presence(
+            activity=Activity(
+                type=ActivityType.watching,
+                name=f"dt!도움",
+            )
+        )
 
         print("ready")

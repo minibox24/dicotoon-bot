@@ -83,6 +83,29 @@ class DicoToonCog(commands.Cog):
             if stop_count >= 200:
                 break
 
+    @commands.command("도움", aliases=["도움말", "help"])
+    async def help(self, ctx):
+        p = ctx.prefix
+
+        embed = discord.Embed(title="도움", color=discord.Color.blurple())
+
+        embed.description = f"[봇 초대하기](https://discord.com/api/oauth2/authorize?client_id=883295202075344916&scope=bot)\n[서포트 서버](https://discord.gg/pbd2xXJ)\n[웹 사이트](https://dicotoon.minibox.xyz/)"
+
+        embed.add_field(name=f"{p}도움", value="도움말을 보여줍니다.", inline=False)
+        embed.add_field(
+            name=f"{p}등록 [이름] (채널)",
+            value="선택한 채널 또는 현재 채널을 디코툰 서비스에 등록합니다.",
+            inline=False,
+        )
+        embed.add_field(
+            name=f"{p}탈퇴 (채널)", value="선택한 채널 또는 현재 채널을 디코툰 서비스에서 탈퇴합니다.", inline=False
+        )
+        embed.add_field(
+            name=f"{p}아이디 (채널)", value="선택한 채널 또는 현재 채널의 아이디를 보여줍니다.", inline=False
+        )
+
+        await ctx.send(embed=embed)
+
     @commands.command("종료")
     @commands.is_owner()
     async def exit_bot(self, ctx):
@@ -105,8 +128,11 @@ class DicoToonCog(commands.Cog):
                 f"{ctx.author.name}님은 {channel.mention}에 채널 관리 권한이 없어요."
             )
 
-        if not channel.permissions_for(ctx.guild.me).read_message_history:
-            return await ctx.send(f"{channel.mention}에서 저에게 메시지 기록 보기 권한이 필요해요.")
+        perm = channel.permissions_for(ctx.guild.me)
+        if not perm.view_channel or not perm.read_message_history:
+            return await ctx.send(
+                f"{channel.mention}에서 저에게 채널 보기 권한과 메시지 기록 보기 권한이 필요해요."
+            )
 
         embed = discord.Embed(
             title="확인",
@@ -117,7 +143,7 @@ class DicoToonCog(commands.Cog):
             name="주의 사항",
             value="\n".join(
                 [
-                    "1. 채널을 디코툰 서비스에 등록하게 된다면 채널 아이디를 알고 있는 모든 사람들이 채널의 사진들을 확인할 수 있게 됩니다.",
+                    "1. 채널을 디코툰 서비스에 등록하게 된다면 채널의 아이디 또는 입력하신 이름을 알고 있는 모든 사람들이 채널의 사진들을 확인할 수 있게 됩니다.",
                     "2. 등록한 채널에서 :star2: 리액션이 달리게 된 모든 사진들의 URL은 서비스 탈퇴시까지 데이터베이스에 남아있게 됩니다.",
                     "3. 데이터베이스에 남아있는 사진들은 관리자가 비밀로 확인할 수 있고, Discord TOS에 위반하는 사진이 있다면 즉시 블랙리스트 처리됩니다.",
                 ]
