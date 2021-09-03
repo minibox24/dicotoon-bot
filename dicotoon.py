@@ -59,7 +59,14 @@ class DicoToonCog(commands.Cog):
             if list(filter(lambda r: r.emoji == "\N{GLOWING STAR}", message.reactions)):
                 attachment = message.attachments[0]
 
-                if not attachment.content_type.startswith("image/"):
+                if attachment.content_type:
+                    if not attachment.content_type.startswith("image/"):
+                        continue
+                else:
+                    if not attachment.filename.endswith((".png", ".jpg", ".gif")):
+                        continue
+
+                if await ToonData.exists(message_id=message.id):
                     continue
 
                 user = users.get(message.author.id)
