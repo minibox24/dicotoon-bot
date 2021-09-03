@@ -166,9 +166,16 @@ class DicoToonCog(commands.Cog):
 
         await msg.edit(f"{channel.mention}을(를) 디코툰 서비스에서 탈퇴했어요.", embed=None, view=None)
 
+    @commands.command("아이디")
+    async def channel_id(self, ctx, channel: discord.TextChannel = None):
+        if not channel:
+            channel = ctx.channel
+
+        await ctx.send(f"{channel.mention}의 아이디는 `{channel.id}`입니다.")
+
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
-        if payload.emoji != "\N{GLOWING STAR}":
+        if str(payload.emoji) != "\N{GLOWING STAR}":
             return
 
         toon_channel = await ToonChannel.filter(id=payload.channel_id).first()
@@ -196,11 +203,12 @@ class DicoToonCog(commands.Cog):
             user=user,
             channel=toon_channel,
             created_at=message.created_at,
+            message_id=message.id,
         )
 
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload):
-        if payload.emoji != "\N{GLOWING STAR}":
+        if str(payload.emoji) != "\N{GLOWING STAR}":
             return
 
         toon_data = await ToonData.filter(message_id=payload.message_id).first()
@@ -224,7 +232,7 @@ class DicoToonCog(commands.Cog):
 
     @commands.Cog.listener()
     async def on_raw_reaction_clear_emoji(self, payload):
-        if payload.emoji != "\N{GLOWING STAR}":
+        if str(payload.emoji) != "\N{GLOWING STAR}":
             return
 
         toon_data = await ToonData.filter(message_id=payload.message_id).first()
