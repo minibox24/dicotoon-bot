@@ -1,0 +1,2 @@
+discord.pyc
+tortoise-orm[asyncpg]
